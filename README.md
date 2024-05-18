@@ -1,2 +1,2 @@
-## AWS Snowflake Data Pipeline using Kinesis and Airflow
+## AWS Snowflake Data Pipeline using Kinesis & Airflow
 
