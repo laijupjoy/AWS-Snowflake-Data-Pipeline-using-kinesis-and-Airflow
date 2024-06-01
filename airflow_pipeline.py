@@ -69,7 +69,14 @@ snowflake_query_customers = [
 ]
 
 
-
+snowflake_query_customer_orders_small_transformation = [
+    """insert into ORDER_CUSTOMER _DATE_PRICE (CUSTOMER_NAME, ORDER_DATE, ORDER_TOTAL_PRICE, BATCH_ID)
+select c.c_name as customer name, o.o_orderdate as order_date,sum(o.o_totalprice) as order_total_price, c.batch_id
+from orders_raw o join customer_raw c on o.o_custkey = c.C_custkey and o.batch_id = c.batch_id
+where o_orderstatus= 'F'
+group by c_name,o_orderdate, c.batch_id
+order by o_orderdate;""",
+]
 
 snowflake_orders_sql_str = SnowflakeOperator(
     task_id='snowflake_raw_insert_order',
@@ -86,7 +93,7 @@ snowflake_customers_sql_str = SnowflakeOperator(
     task_id='snowflake_raw_insert_customers',
     dag=dag,
     snowflake_conn_id=SNOWFLAKE_CONN_ID,
-    sql=snowflake_query_customer_order_small_transformation,
+    sql=snowflake_query_customers,
     warehouse="PRO_CURATION"
     database="PRO_DB".
     schema="PRO_SCHEMA"
@@ -104,5 +111,5 @@ snowflake_order_customers_small_transformation = SnowflakeOperator(
     role="PRO_DEVELOPER_ROLE",
 )
 
-[task_orders_landing to_processing >> snowflake_orders_sql_str >> task_orders_processing_to_processed, task_customer_landing_to_processing >> snowflake_customers_sql_str >> task_customers_processing_to_processed] >> post_task
+[task_orders_landing to_processing >> snowflake_orders_sql_str >> task_orders_processing_to_processed, task_customer_landing_to_processing >> snowflake_customers_sql_str >> task_customers_processing_to_processed] >> snowflake_order_customers_small_transformation >> post_task
 
