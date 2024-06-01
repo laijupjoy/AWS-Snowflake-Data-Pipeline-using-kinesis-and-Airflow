@@ -67,3 +67,42 @@ snowflake_query_customers = [
 (C_CUSTKEY, C_NAME, C_ADDRESS, C_NATTONKEY, C_PHONE, C_ACCTBAL, C_MKTSEGMENT, C_COMMENT
 ( select t.$1,t.$2,t.$3,t.$4,t.$5,t.$6,t.$7,t.$8,'{0}' from @CUSTOMER_RAW_STAGE t);""",
 ]
+
+
+
+
+snowflake_orders_sql_str = SnowflakeOperator(
+    task_id='snowflake_raw_insert_order',
+    dag=dag,
+    snowflake_conn_id=SNOWFLAKE_CONN_ID,
+    sql=snowflake_query_orders,
+    warehouse="PRO_CURATION"
+    database="PRO_DB",
+    schema="PRO_SCHEMA"
+    role="PRO_DEVELOPER_ROLE",
+)
+
+snowflake_customers_sql_str = SnowflakeOperator(
+    task_id='snowflake_raw_insert_customers',
+    dag=dag,
+    snowflake_conn_id=SNOWFLAKE_CONN_ID,
+    sql=snowflake_query_customer_order_small_transformation,
+    warehouse="PRO_CURATION"
+    database="PRO_DB".
+    schema="PRO_SCHEMA"
+    role="PRO_DEVELOPER_ROLE",
+)
+
+snowflake_order_customers_small_transformation = SnowflakeOperator(
+    task_id='snowflake_order_customers_small_transformation',
+    dag=dag,
+    snowflake_conn_id=SNOWFLAKE_CONN_ID,
+    sql=snowflake_query_customer_order_small_transformation,
+    warehouse="PRO_CURATION"
+    database="PRO_DB".
+    schema="PRO_SCHEMA"
+    role="PRO_DEVELOPER_ROLE",
+)
+
+[task_orders_landing to_processing >> snowflake_orders_sql_str >> task_orders_processing_to_processed, task_customer_landing_to_processing >> snowflake_customers_sql_str >> task_customers_processing_to_processed] >> post_task
+
