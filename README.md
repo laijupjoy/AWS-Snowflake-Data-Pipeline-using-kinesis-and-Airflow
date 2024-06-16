@@ -5,3 +5,8 @@ The AWS Snowflake data pipeline leverages Amazon Kinesis for real-time data stre
 ## Architecture
 
 ![aws snowflake](https://github.com/laijupjoy/AWS-Snowflake-Data-Pipeline-using-kinesis-and-Airflow/assets/87544051/3bebdc99-e743-406e-b993-953b5e6086e6)
+
+## Airflow DAG
+
+<img width="925" alt="airflow snowflake" src="https://github.com/laijupjoy/AWS-Snowflake-Data-Pipeline-using-kinesis-and-Airflow/assets/87544051/1c287546-7250-431c-b2a9-ee137be834df">
+
